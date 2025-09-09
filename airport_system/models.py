@@ -47,18 +47,24 @@ class AirplaneType(models.Model):
     def __str__(self):
         return self.name
 
+
 class Airplane(models.Model):
     name = models.CharField()
     rows = models.IntegerField()
     seats_in_row = models.IntegerField()
     airplane_type = models.ForeignKey(AirplaneType, on_delete=CASCADE)
 
-    def __str__(self):
+    @property
+    def airplane_info(self):
         return f"{self.name} ({self.airplane_type})"
 
     @property
     def capacity(self):
         return self.rows * self.seats_in_row
+
+    def __str__(self):
+        return self.airplane_info
+
 
 class Flight(models.Model):
     route = models.ForeignKey(Route, on_delete=CASCADE)

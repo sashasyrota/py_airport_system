@@ -1,11 +1,12 @@
 from django.db.models import Func, F, Value
+from django.db.models.aggregates import Count
 from rest_framework import viewsets
 
 from airport_system.models import Crew, Airport, Route, Order, AirplaneType, Airplane, Flight, Ticket
 from airport_system.serializers import CrewSerializer, AirportSerializer, RouteSerializer, OrderSerializer, \
     AirplaneTypeSerializer, AirplaneSerializer, FlightSerializer, RouteListSerializer, FlightListSerializer, \
-    AirplaneListSerializer, RouteRetrieveSerializer, OrderListSerializer, AirplaneRetrieveSerializer, \
-    OrderRetrieveSerializer
+     RouteRetrieveSerializer, OrderListSerializer, \
+    OrderRetrieveSerializer, FlightRetrieveSerializer
 
 
 class CrewViewSet(viewsets.ModelViewSet):
@@ -58,15 +59,20 @@ class AirplaneTypeViewSet(viewsets.ModelViewSet):
 class AirplaneViewSet(viewsets.ModelViewSet):
     queryset = Airplane.objects.none()
 
+    @staticmethod
+    def str_to_list(str_data: str) -> list:
+        return [int(data) for data in (str_data.split(","))]
+
     def get_serializer_class(self):
-        if self.action == "list":
-            return AirplaneListSerializer
-        if self.action == "retrieve":
-            return AirplaneRetrieveSerializer
         return AirplaneSerializer
 
     def get_queryset(self):
-        queryset = Airplane.objects.all()
+        airplane_types = self.request.query_params.get("airplane_types")
+        if airplane_types:
+            queryset = Airplane.objects.filter(airplane_type__in=AirplaneViewSet.str_to_list(airplane_types))
+        else:
+            queryset = Airplane.objects.all()
+
         if self.action in ("list", "retrieve"):
             return queryset.select_related()
         return queryset
@@ -78,21 +84,26 @@ class FlightViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return FlightListSerializer
+        elif self.action == "retrieve":
+            return FlightRetrieveSerializer
         return FlightSerializer
 
     def get_queryset(self):
+        source_airport = self.request.query_params.get("source_airport")
+        destination_airport = self.request.query_params.get("destination_airport")
         queryset = Flight.objects.all()
+        if source_airport:
+            queryset = queryset.filter(route__source__in=AirplaneViewSet.str_to_list(source_airport))
+        if destination_airport:
+            queryset = queryset.filter(route__destination__in=AirplaneViewSet.str_to_list(destination_airport))
+
+
         if self.action in ("list", "retrieve"):
             return (
                 queryset
                 .select_related("route__destination", "route__source", "airplane")
                 .annotate(
-                    source_destination=Func(
-                        F("route__source__name"),
-                        Value(" - "),
-                        F("route__destination__name"),
-                        function="CONCAT"
-                    )
+                    num_available_seats=F("airplane__rows") * F("airplane__seats_in_row") - Count("ticket")
                 )
             )
 
