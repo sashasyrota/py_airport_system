@@ -1,6 +1,5 @@
 from django.db import transaction
 from rest_framework import serializers
-from rest_framework.relations import PrimaryKeyRelatedField
 
 from airport_system.models import Crew, Airport, Route, Order, AirplaneType, Airplane, Flight, Ticket
 
@@ -47,13 +46,19 @@ class AirplaneSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "rows", "seats_in_row", "airplane_type", "capacity"]
 
 
+class AirplaneRetrieveSerializer(AirplaneSerializer):
+    class Meta:
+        model = Airplane
+        fields = ["id", "name", "rows", "seats_in_row", "airplane_type", "capacity", "image"]
+
+
 class FlightSerializer(serializers.ModelSerializer):
     route = serializers.PrimaryKeyRelatedField(queryset=Route.objects.all().select_related())
     airplane = serializers.PrimaryKeyRelatedField(queryset=Airplane.objects.only("id", "name").select_related())
 
     class Meta:
         model = Flight
-        fields = ["id", "route", "departure_time", "airplane", "arrival_time"]
+        fields = ["id", "route", "departure_time", "airplane", "arrival_time", "crew"]
 
 
 class FlightListSerializer(serializers.ModelSerializer):
@@ -108,10 +113,11 @@ class TicketFlightSerializer(serializers.ModelSerializer):
 class FlightRetrieveSerializer(FlightListSerializer):
     airplane = serializers.SlugRelatedField(queryset=Airplane.objects.all().select_related(), slug_field="airplane_info")
     taken_seats = TicketFlightSerializer(many=True, read_only=True, source="ticket_set")
+    crew = serializers.SlugRelatedField(many=True, read_only=True, slug_field="full_name")
 
     class Meta:
         model = Flight
-        fields = ["id", "route", "departure_time", "airplane", "arrival_time",  "num_available_seats", "taken_seats"]
+        fields = ["id", "route", "departure_time", "airplane", "arrival_time", "crew", "num_available_seats", "taken_seats"]
 
 
 class FlightTicketRetrieveSerializer(serializers.ModelSerializer):
@@ -138,6 +144,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         with transaction.atomic():
+            print(validated_data)
             tickets_data = validated_data.pop('tickets')
             order = Order.objects.create(**validated_data)
             for ticket_data in tickets_data:
@@ -148,6 +155,16 @@ class OrderSerializer(serializers.ModelSerializer):
 class OrderListSerializer(OrderSerializer):
     tickets = TicketListSerializer(many=True, read_only=True)
 
+    class Meta:
+        model = Order
+        fields = ["id", "created_at", "tickets", "user"]
+
 
 class OrderRetrieveSerializer(OrderSerializer):
     tickets = TicketRetrieveSerializer(many=True, read_only=True)
+
+
+class AirplaneImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Airplane
+        fields = ["id", "image"]
