@@ -1,7 +1,14 @@
 from rest_framework import routers
 
-from airport_system.views import CrewViewSet, AirportViewSet, RouteViewSet, OrderViewSet, AirplaneTypeViewSet, \
-    AirplaneViewSet, FlightViewSet
+from airport_system.views import (
+    CrewViewSet,
+    AirportViewSet,
+    RouteViewSet,
+    OrderViewSet,
+    AirplaneTypeViewSet,
+    AirplaneViewSet,
+    FlightViewSet
+)
 
 app_name = "airport_system"
 

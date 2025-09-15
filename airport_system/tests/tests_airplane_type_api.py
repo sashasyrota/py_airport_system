@@ -3,15 +3,18 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
-from airport_system.models import Crew, AirplaneType
-from airport_system.serializers import CrewSerializer, AirplaneTypeSerializer
+from airport_system.models import AirplaneType
+from airport_system.serializers import AirplaneTypeSerializer
 from user.models import User
 
 AIRPLANE_TYPE_URL = reverse("airport_system:airplanetype-list")
 
 
 def airplane_type_detail_url(airplane_type_id: int):
-    return reverse("airport_system:airplanetype-detail", args=(airplane_type_id,))
+    return reverse(
+        "airport_system:airplanetype-detail",
+        args=(airplane_type_id,)
+    )
 
 
 def sample_airplane_type(**params):
@@ -60,10 +63,13 @@ class AuthenticatedTests(TestCase):
 class AdminTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.admin_user = User.objects.create_user(email="admin_test", password="admin_testtest", is_staff=True)
+        self.admin_user = User.objects.create_user(
+            email="admin_test",
+            password="admin_testtest",
+            is_staff=True
+        )
         self.client.force_authenticate(self.admin_user)
         self.airplane_type = sample_airplane_type()
-
 
     def test_admin_create_airplane_type(self):
         data_airplane_type = {

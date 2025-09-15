@@ -8,7 +8,10 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
 from airport_system.models import AirplaneType, Airplane
-from airport_system.serializers import AirplaneRetrieveSerializer, AirplaneListSerializer
+from airport_system.serializers import (
+    AirplaneRetrieveSerializer,
+    AirplaneListSerializer
+)
 from user.models import User
 
 AIRPLANE_URL = reverse("airport_system:airplane-list")
@@ -65,7 +68,10 @@ class AuthenticatedTests(TestCase):
         }
         sample_airplane(**params1)
         airplanes = Airplane.objects.filter(airplane_type=airplane_type1.id)
-        result = self.client.get(f"{AIRPLANE_URL}?airplane_types={airplane_type1.id}")
+        result = self.client.get(
+            f"{AIRPLANE_URL}"
+            f"?airplane_types={airplane_type1.id}"
+        )
         serializer = AirplaneListSerializer(airplanes, many=True)
         self.assertEqual(result.data["results"], serializer.data)
 
@@ -96,11 +102,14 @@ class AuthenticatedTests(TestCase):
 class AdminTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.admin_user = User.objects.create_user(email="admin_test", password="admin_testtest", is_staff=True)
+        self.admin_user = User.objects.create_user(
+            email="admin_test",
+            password="admin_testtest",
+            is_staff=True
+        )
         self.client.force_authenticate(self.admin_user)
         self.airplane = sample_airplane()
         self.airplane_type = AirplaneType.objects.create(name="test_type")
-
 
     def test_admin_create_airplane(self):
         data_airplane = {

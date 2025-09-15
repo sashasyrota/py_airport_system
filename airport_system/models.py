@@ -29,7 +29,11 @@ class Airport(models.Model):
 
 
 class Route(models.Model):
-    source = models.ForeignKey(Airport, on_delete=CASCADE, related_name="routes")
+    source = models.ForeignKey(
+        Airport,
+        on_delete=CASCADE,
+        related_name="routes"
+    )
     destination = models.ForeignKey(Airport, on_delete=CASCADE)
     distance = models.IntegerField()
 
@@ -42,13 +46,21 @@ class Route(models.Model):
 
     class Meta:
         constraints = [
-            UniqueConstraint(fields=["source", "destination"], name="unique route")
+            UniqueConstraint(
+                fields=["source", "destination"],
+                name="unique route"
+            )
         ]
 
 
 class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(get_user_model(), on_delete=CASCADE, related_name="orders", null=True)
+    user = models.ForeignKey(
+        get_user_model(),
+        on_delete=CASCADE,
+        related_name="orders",
+        null=True
+    )
 
 
 class AirplaneType(models.Model):
@@ -59,11 +71,11 @@ class AirplaneType(models.Model):
 
 
 def create_custom_path(instance, filename):
-   _, extension = os.path.splitext(filename)
-   return os.path.join(
+    _, extension = os.path.splitext(filename)
+    return os.path.join(
        "uploads/images/",
        f"{slugify(instance.name)}-{uuid.uuid4()}{extension}"
-   )
+    )
 
 
 class Airplane(models.Model):
@@ -93,8 +105,8 @@ class Flight(models.Model):
     crew = models.ManyToManyField(Crew, blank=True)
 
     def __str__(self):
-        return f"{self.route} {self.airplane}, {self.departure_time} - {self.arrival_time}"
-
+        return (f"{self.route} {self.airplane}, "
+                f"{self.departure_time} - {self.arrival_time}")
 
 
 class Ticket(models.Model):
@@ -105,5 +117,8 @@ class Ticket(models.Model):
 
     class Meta:
         constraints = [
-            UniqueConstraint(fields=["row", "seat", "flight"], name="unique seats for flight")
+            UniqueConstraint(
+                fields=["row", "seat", "flight"],
+                name="unique seats for flight"
+            )
         ]

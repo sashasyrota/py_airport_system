@@ -5,8 +5,9 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from airport_system.models import Airport
-from airport_system.serializers import AirportSerializer, AirplaneRetrieveSerializer
-from airport_system.tests.tests_airplane_api import sample_airplane
+from airport_system.serializers import (
+    AirportSerializer
+)
 from user.models import User
 
 
@@ -21,8 +22,10 @@ def sample_airport(**params):
     defaults.update(params)
     return Airport.objects.create(**defaults)
 
+
 def airplane_detail_url(airplane_id: int):
     return reverse("airport_system:airplane-detail", args=(airplane_id,))
+
 
 def airport_detail_url(airport_id: int):
     return reverse("airport_system:airport-detail", args=(airport_id,))
@@ -66,7 +69,11 @@ class AuthenticatedTests(TestCase):
 class AdminTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.admin_user = User.objects.create_user(email="admin_test", password="admin_testtest", is_staff=True)
+        self.admin_user = User.objects.create_user(
+            email="admin_test",
+            password="admin_testtest",
+            is_staff=True
+        )
         self.client.force_authenticate(self.admin_user)
 
     def test_admin_create_airport(self):

@@ -61,10 +61,13 @@ class AuthenticatedTests(TestCase):
 class AdminTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.admin_user = User.objects.create_user(email="admin_test", password="admin_testtest", is_staff=True)
+        self.admin_user = User.objects.create_user(
+            email="admin_test",
+            password="admin_testtest",
+            is_staff=True
+        )
         self.client.force_authenticate(self.admin_user)
         self.airplane = sample_crew()
-
 
     def test_admin_create_crew(self):
         data_crew = {

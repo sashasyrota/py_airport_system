@@ -7,14 +7,16 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
 from airport_system.models import Flight
-from airport_system.serializers import FlightListSerializer, FlightRetrieveSerializer
+from airport_system.serializers import (
+    FlightListSerializer,
+    FlightRetrieveSerializer
+)
 from airport_system.tests.tests_airplane_api import sample_airplane
 from airport_system.tests.tests_airport_api import sample_airport
 from airport_system.tests.tests_route_api import sample_route
 from user.models import User
 
 FLIGHT_URL = reverse("airport_system:flight-list")
-
 
 
 def sample_flight(**params):
@@ -50,9 +52,18 @@ class AuthenticatedTests(TestCase):
         self.airport1 = sample_airport()
         self.airport2 = sample_airport(name="test_airport2")
         self.airport3 = sample_airport(name="test_airport3")
-        self.route1 = sample_route(source=self.airport1, destination=self.airport2)
-        self.route2 = sample_route(source=self.airport2, destination=self.airport1)
-        self.route3 = sample_route(source=self.airport2, destination=self.airport3)
+        self.route1 = sample_route(
+            source=self.airport1,
+            destination=self.airport2
+        )
+        self.route2 = sample_route(
+            source=self.airport2,
+            destination=self.airport1
+        )
+        self.route3 = sample_route(
+            source=self.airport2,
+            destination=self.airport3
+        )
         self.flight1 = sample_flight(route=self.route1, airplane=self.airplane)
         sample_flight(route=self.route2, airplane=self.airplane)
         sample_flight(route=self.route3, airplane=self.airplane)
@@ -60,7 +71,8 @@ class AuthenticatedTests(TestCase):
     def test_flight_list(self):
         result = self.client.get(FLIGHT_URL)
         flights = Flight.objects.all().annotate(
-            num_available_seats=F("airplane__rows") * F("airplane__seats_in_row") - Count("ticket")
+            num_available_seats=F("airplane__rows")
+            * F("airplane__seats_in_row") - Count("ticket")
         )
         serializer = FlightListSerializer(flights, many=True)
         self.assertEqual(result.status_code, status.HTTP_200_OK)
@@ -68,20 +80,36 @@ class AuthenticatedTests(TestCase):
 
     def test_filter_flight_by_source_destination(self):
         flights = Flight.objects.all()
-        flights_with_params = flights.filter(route__source=self.airport2.id,
-                                             route__destination=self.airport1.id).annotate(
-            num_available_seats=F("airplane__rows") * F("airplane__seats_in_row") - Count("ticket")
+        flights_with_params = flights.filter(
+            route__source=self.airport2.id,
+            route__destination=self.airport1.id).annotate(
+            num_available_seats=F("airplane__rows")
+            * F("airplane__seats_in_row") - Count("ticket")
         )
         result_with_params = self.client.get(
-            f"{FLIGHT_URL}?source_airport={self.airport2.id}&destination_airport={self.airport1.id}")
-        serializer_with_params = FlightListSerializer(flights_with_params, many=True)
+            f"{FLIGHT_URL}"
+            f"?source_airport={self.airport2.id}"
+            f"&destination_airport={self.airport1.id}"
+        )
+        serializer_with_params = (
+            FlightListSerializer(flights_with_params, many=True)
+        )
         flights_without_params = flights.annotate(
-            num_available_seats=F("airplane__rows") * F("airplane__seats_in_row") - Count("ticket")
+            num_available_seats=F("airplane__rows")
+            * F("airplane__seats_in_row") - Count("ticket")
         )
         result_without_params = self.client.get(f"{FLIGHT_URL}")
-        serializer_without_params = FlightListSerializer(flights_without_params, many=True)
-        self.assertEqual(serializer_with_params.data, result_with_params.data["results"])
-        self.assertEqual(serializer_without_params.data, result_without_params.data["results"])
+        serializer_without_params = (
+            FlightListSerializer(flights_without_params, many=True)
+        )
+        self.assertEqual(
+            serializer_with_params.data,
+            result_with_params.data["results"]
+        )
+        self.assertEqual(
+            serializer_without_params.data,
+            result_without_params.data["results"]
+        )
 
     def test_retrieve_flight(self):
         url = flight_detail_url(self.flight1.id)
@@ -99,11 +127,18 @@ class AuthenticatedTests(TestCase):
 class AdminTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.admin_user = User.objects.create_user(email="admin_test", password="admin_testtest", is_staff=True)
+        self.admin_user = User.objects.create_user(
+            email="admin_test",
+            password="admin_testtest",
+            is_staff=True
+        )
         self.client.force_authenticate(self.admin_user)
         self.airport1 = sample_airport()
         self.airport2 = sample_airport(name="test_airport2")
-        self.route1 = sample_route(source=self.airport1, destination=self.airport2)
+        self.route1 = sample_route(
+            source=self.airport1,
+            destination=self.airport2
+        )
         self.airplane = sample_airplane()
 
     def test_admin_create_flight(self):

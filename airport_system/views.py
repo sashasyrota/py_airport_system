@@ -1,16 +1,41 @@
-from django.db.models import Func, F, Value
+from django.db.models import F
 from django.db.models.aggregates import Count
 from rest_framework import viewsets, status
-from rest_framework.decorators import action, permission_classes
-from rest_framework.permissions import BasePermission, SAFE_METHODS, IsAuthenticated
+from rest_framework.decorators import action
+from rest_framework.permissions import (
+    BasePermission,
+    SAFE_METHODS,
+    IsAuthenticated
+)
 from rest_framework.response import Response
 
-from airport_system.models import Crew, Airport, Route, Order, AirplaneType, Airplane, Flight, Ticket
-from airport_system.serializers import CrewSerializer, AirportSerializer, RouteSerializer, OrderSerializer, \
-    AirplaneTypeSerializer, AirplaneSerializer, FlightSerializer, RouteListSerializer, FlightListSerializer, \
-    RouteRetrieveSerializer, OrderListSerializer, \
-    OrderRetrieveSerializer, FlightRetrieveSerializer, AirplaneImageSerializer, \
-    AirplaneRetrieveSerializer, AirplaneListSerializer
+from airport_system.models import (
+    Crew,
+    Airport,
+    Route,
+    Order,
+    AirplaneType,
+    Airplane,
+    Flight
+)
+from airport_system.serializers import (
+    CrewSerializer,
+    AirportSerializer,
+    RouteSerializer,
+    OrderSerializer,
+    AirplaneTypeSerializer,
+    AirplaneSerializer,
+    FlightSerializer,
+    RouteListSerializer,
+    FlightListSerializer,
+    RouteRetrieveSerializer,
+    OrderListSerializer,
+    OrderRetrieveSerializer,
+    FlightRetrieveSerializer,
+    AirplaneImageSerializer,
+    AirplaneRetrieveSerializer,
+    AirplaneListSerializer
+)
 
 
 class IsAdminOrIsAuthenticatedReadOnly(BasePermission):
@@ -56,14 +81,17 @@ class RouteViewSet(viewsets.ModelViewSet):
             return queryset.select_related()
         return queryset
 
+
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.none()
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         if self.action in ("list", "retrieve"):
-            optimize_queryset = Order.objects.all().prefetch_related("tickets__flight__route__source",
-                                                 "tickets__flight__route__destination")
+            optimize_queryset = Order.objects.all().prefetch_related(
+                "tickets__flight__route__source",
+                "tickets__flight__route__destination"
+            )
             if self.request.user.is_superuser:
                 return optimize_queryset
             return optimize_queryset.filter(user=self.request.user)
@@ -90,7 +118,12 @@ class AirplaneViewSet(viewsets.ModelViewSet):
     queryset = Airplane.objects.none()
     permission_classes = [IsAdminOrIsAuthenticatedReadOnly]
 
-    @action(methods=["POST"], detail=True, url_path="upload-image", permission_classes=[IsAdminOrIsAuthenticatedReadOnly])
+    @action(
+        methods=["POST"],
+        detail=True,
+        url_path="upload-image",
+        permission_classes=[IsAdminOrIsAuthenticatedReadOnly]
+    )
     def upload_image(self, request, pk=None):
         airplane = self.get_object()
         serializer = self.get_serializer(airplane, data=request.data)
@@ -116,7 +149,9 @@ class AirplaneViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         airplane_types = self.request.query_params.get("airplane_types")
         if airplane_types:
-            queryset = Airplane.objects.filter(airplane_type__in=AirplaneViewSet.str_to_list(airplane_types))
+            queryset = Airplane.objects.filter(
+                airplane_type__in=AirplaneViewSet.str_to_list(airplane_types)
+            )
         else:
             queryset = Airplane.objects.all()
 
@@ -138,21 +173,33 @@ class FlightViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         source_airport = self.request.query_params.get("source_airport")
-        destination_airport = self.request.query_params.get("destination_airport")
+        destination_airport = (
+            self.request.query_params.get("destination_airport")
+        )
         queryset = Flight.objects.all()
         if source_airport:
-            queryset = queryset.filter(route__source__in=AirplaneViewSet.str_to_list(source_airport))
+            queryset = queryset.filter(
+                route__source__in=AirplaneViewSet
+                .str_to_list(source_airport)
+            )
         if destination_airport:
-            queryset = queryset.filter(route__destination__in=AirplaneViewSet.str_to_list(destination_airport))
-
+            queryset = queryset.filter(
+                route__destination__in=AirplaneViewSet
+                .str_to_list(destination_airport)
+            )
 
         if self.action in ("list", "retrieve"):
             return (
                 queryset
-                .select_related("route__destination", "route__source", "airplane")
+                .select_related(
+                    "route__destination",
+                    "route__source",
+                    "airplane"
+                )
                 .prefetch_related("crew")
                 .annotate(
-                    num_available_seats=F("airplane__rows") * F("airplane__seats_in_row") - Count("ticket")
+                    num_available_seats=F("airplane__rows")
+                    * F("airplane__seats_in_row") - Count("ticket")
                 )
             )
 
