@@ -7,8 +7,6 @@ from django.db.models import CASCADE
 from django.db.models.constraints import UniqueConstraint
 from django.utils.text import slugify
 
-from airport.settings import AUTH_USER_MODEL
-
 
 class Crew(models.Model):
     first_name = models.CharField(max_length=64)
@@ -92,7 +90,7 @@ class Flight(models.Model):
     airplane = models.ForeignKey(Airplane, on_delete=CASCADE)
     departure_time = models.DateTimeField()
     arrival_time = models.DateTimeField()
-    crew = models.ManyToManyField(Crew)
+    crew = models.ManyToManyField(Crew, blank=True)
 
     def __str__(self):
         return f"{self.route} {self.airplane}, {self.departure_time} - {self.arrival_time}"

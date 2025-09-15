@@ -10,7 +10,7 @@ from airport_system.serializers import CrewSerializer, AirportSerializer, RouteS
     AirplaneTypeSerializer, AirplaneSerializer, FlightSerializer, RouteListSerializer, FlightListSerializer, \
     RouteRetrieveSerializer, OrderListSerializer, \
     OrderRetrieveSerializer, FlightRetrieveSerializer, AirplaneImageSerializer, \
-    AirplaneRetrieveSerializer
+    AirplaneRetrieveSerializer, AirplaneListSerializer
 
 
 class IsAdminOrIsAuthenticatedReadOnly(BasePermission):
@@ -90,7 +90,7 @@ class AirplaneViewSet(viewsets.ModelViewSet):
     queryset = Airplane.objects.none()
     permission_classes = [IsAdminOrIsAuthenticatedReadOnly]
 
-    @action(methods=["POST"], detail=True, url_path="upload_image", permission_classes=[IsAdminOrIsAuthenticatedReadOnly])
+    @action(methods=["POST"], detail=True, url_path="upload-image", permission_classes=[IsAdminOrIsAuthenticatedReadOnly])
     def upload_image(self, request, pk=None):
         airplane = self.get_object()
         serializer = self.get_serializer(airplane, data=request.data)
@@ -105,7 +105,9 @@ class AirplaneViewSet(viewsets.ModelViewSet):
         return [int(data) for data in (str_data.split(","))]
 
     def get_serializer_class(self):
-        if self.action == "upload_image":
+        if self.action == "list":
+            return AirplaneListSerializer
+        elif self.action == "upload_image":
             return AirplaneImageSerializer
         elif self.action == "retrieve":
             return AirplaneRetrieveSerializer

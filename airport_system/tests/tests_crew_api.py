@@ -1,31 +1,26 @@
 from django.test import TestCase
-
-from django.urls import reverse
 from rest_framework import status
+from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
-from airport_system.models import Airport
-from airport_system.serializers import AirportSerializer, AirplaneRetrieveSerializer
-from airport_system.tests.tests_airplane_api import sample_airplane
+from airport_system.models import Crew
+from airport_system.serializers import CrewSerializer
 from user.models import User
 
+CREW_URL = reverse("airport_system:crew-list")
 
-AIRPORT_URL = reverse("airport_system:airport-list")
+
+def crew_detail_url(crew_id: int):
+    return reverse("airport_system:crew-detail", args=(crew_id,))
 
 
-def sample_airport(**params):
+def sample_crew(**params):
     defaults = {
-        "name": "test_airport",
-        "closest_big_city": "test_city"
+        "first_name": "test_first_name",
+        "last_name": "test_last_name",
     }
     defaults.update(params)
-    return Airport.objects.create(**defaults)
-
-def airplane_detail_url(airplane_id: int):
-    return reverse("airport_system:airplane-detail", args=(airplane_id,))
-
-def airport_detail_url(airport_id: int):
-    return reverse("airport_system:airport-detail", args=(airport_id,))
+    return Crew.objects.create(**defaults)
 
 
 class UnauthenticatedTests(TestCase):
@@ -33,7 +28,7 @@ class UnauthenticatedTests(TestCase):
         self.client = APIClient()
 
     def test_auth_required(self):
-        result = self.client.get(AIRPORT_URL)
+        result = self.client.get(CREW_URL)
         self.assertEqual(result.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
@@ -42,24 +37,24 @@ class AuthenticatedTests(TestCase):
         self.client = APIClient()
         self.user = User.objects.create_user(email="test", password="testtest")
         self.client.force_authenticate(self.user)
-        self.airport1 = sample_airport()
+        self.crew1 = sample_crew()
 
-    def test_airport_list(self):
-        result = self.client.get(AIRPORT_URL)
-        airports = Airport.objects.all()
-        serializer = AirportSerializer(airports, many=True)
+    def test_crew_list(self):
+        result = self.client.get(CREW_URL)
+        crews = Crew.objects.all()
+        serializer = CrewSerializer(crews, many=True)
         self.assertEqual(result.status_code, status.HTTP_200_OK)
         self.assertEqual(result.data["results"], serializer.data)
 
-    def test_retrieve_airport(self):
-        url = airport_detail_url(self.airport1.id)
+    def test_retrieve_crew(self):
+        url = crew_detail_url(self.crew1.id)
         result = self.client.get(url)
-        serializer = AirportSerializer(self.airport1)
+        serializer = CrewSerializer(self.crew1)
         self.assertEqual(result.status_code, status.HTTP_200_OK)
         self.assertEqual(result.data, serializer.data)
 
-    def test_create_airport(self):
-        result = self.client.post(AIRPORT_URL)
+    def test_create_airplane(self):
+        result = self.client.post(CREW_URL)
         self.assertEqual(result.status_code, status.HTTP_403_FORBIDDEN)
 
 
@@ -68,10 +63,13 @@ class AdminTests(TestCase):
         self.client = APIClient()
         self.admin_user = User.objects.create_user(email="admin_test", password="admin_testtest", is_staff=True)
         self.client.force_authenticate(self.admin_user)
+        self.airplane = sample_crew()
 
-    def test_admin_create_airport(self):
-        data_airport = {
-            "name": "test_airport"
+
+    def test_admin_create_crew(self):
+        data_crew = {
+            "first_name": "test_first_name",
+            "last_name": "test_last_name",
         }
-        result = self.client.post(AIRPORT_URL, data_airport)
+        result = self.client.post(CREW_URL, data_crew)
         self.assertEqual(result.status_code, status.HTTP_201_CREATED)
