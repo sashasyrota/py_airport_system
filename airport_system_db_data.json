@@ -1,0 +1,178 @@
+[
+  {
+    "model": "user.user",
+    "pk": 1,
+    "fields": {
+      "email":  "test@test.test",
+      "password": "testtest",
+      "is_staff": 1
+    }
+  },
+  {
+    "model": "airport_system.crew",
+    "pk": 1,
+    "fields": {
+      "first_name": "John",
+      "last_name": "Smith"
+    }
+  },
+  {
+    "model": "airport_system.crew",
+    "pk": 2,
+    "fields": {
+      "first_name": "Jack",
+      "last_name": "Torn"
+    }
+  },
+  {
+    "model": "airport_system.airport",
+    "pk": 1,
+    "fields": {
+      "name": "Boryspol",
+      "closest_big_city": "Kiev"
+    }
+  },
+  {
+    "model": "airport_system.airport",
+    "pk": 2,
+    "fields": {
+      "name": "Zaporizhzhia International Airport",
+      "closest_big_city": "Zaporizhzhia"
+    }
+  },
+  {
+    "model": "airport_system.airport",
+    "pk": 3,
+    "fields": {
+      "name": "Antalya International Airport",
+      "closest_big_city": "Antalya"
+    }
+  },
+  {
+    "model": "airport_system.route",
+    "pk": 1,
+    "fields": {
+      "source": 1,
+      "destination": 2,
+      "distance": 600
+    }
+  },
+  {
+    "model": "airport_system.route",
+    "pk": 2,
+    "fields": {
+      "source": 2,
+      "destination": 1,
+      "distance": 600
+    }
+  },
+  {
+    "model": "airport_system.route",
+    "pk": 3,
+    "fields": {
+      "source": 1,
+      "destination": 3,
+      "distance": 1200
+    }
+  },
+  {
+    "model": "airport_system.route",
+    "pk": 4,
+    "fields": {
+      "source": 2,
+      "destination": 3,
+      "distance": 1400
+    }
+  },
+  {
+    "model": "airport_system.airplanetype",
+    "pk": 1,
+    "fields": {
+      "name": "mini"
+    }
+  },
+  {
+    "model": "airport_system.airplanetype",
+    "pk": 2,
+    "fields": {
+      "name": "medium"
+    }
+  },
+  {
+    "model": "airport_system.airplanetype",
+    "pk": 3,
+    "fields": {
+      "name": "large"
+    }
+  },
+  {
+    "model": "airport_system.airplane",
+    "pk": 1,
+    "fields": {
+      "name": "AN 124",
+      "rows": 100,
+      "seats_in_row": 10,
+      "airplane_type": 3
+    }
+  },
+  {
+    "model": "airport_system.airplane",
+    "pk": 2,
+    "fields": {
+      "name": "BOEING 737",
+      "rows": 50,
+      "seats_in_row": 8,
+      "airplane_type": 2
+    }
+  },
+  {
+    "model": "airport_system.airplane",
+    "pk": 3,
+    "fields": {
+      "name": "CESNA",
+      "rows": 1,
+      "seats_in_row": 2,
+      "airplane_type": 1
+    }
+  },
+  {
+    "model": "airport_system.flight",
+    "pk": 1,
+    "fields": {
+      "route": 1,
+      "airplane": 1,
+      "departure_time": "2024-10-09T13:00:00Z",
+      "arrival_time": "2024-10-09T15:00:00Z",
+      "crew": [1]
+    }
+  },
+  {
+    "model": "airport_system.flight",
+    "pk": 2,
+    "fields": {
+      "route": 2,
+      "airplane": 3,
+      "departure_time": "2024-10-11T16:00:00Z",
+      "arrival_time": "2024-10-12T19:00:00Z",
+      "crew": [1]
+    }
+  },
+  {
+    "model": "airport_system.order",
+    "pk": 1,
+    "fields": {
+      "created_at": "2024-10-10T19:00:00Z",
+      "user": 1
+    }
+  },
+  {
+    "model": "airport_system.ticket",
+    "pk": 1,
+    "fields": {
+      "row": 1,
+      "seat": 2,
+      "flight": 2,
+      "order": 1
+    }
+  }
+]
