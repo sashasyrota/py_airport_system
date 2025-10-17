@@ -19,7 +19,7 @@ services:
       - db_airport_service
 
   db_airport_service:
-    image: postgres:16
+    image: postgres:16.0-alpine3.17
     restart: always
     env_file:
       - .env

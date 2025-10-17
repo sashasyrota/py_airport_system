@@ -1,12 +1,11 @@
 import time
 
-from django.core.management import BaseCommand, CommandError
+from django.core.management import BaseCommand
 from django.db import connection, OperationalError
 
 
 class Command(BaseCommand):
     help = "Checking database connection"
-
 
     def handle(self, *args, **options):
         sec = 0

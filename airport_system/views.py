@@ -1,6 +1,10 @@
 from django.db.models import F
 from django.db.models.aggregates import Count
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
+from drf_spectacular.utils import (
+    extend_schema,
+    OpenApiParameter,
+    OpenApiExample
+)
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import (
@@ -171,7 +175,8 @@ class AirplaneViewSet(viewsets.ModelViewSet):
                     OpenApiExample(
                         'Example 1',
                         summary='Example with airplane_type',
-                        description='Example that show filtering by airplane_type_id = 1',
+                        description='Example that show filtering '
+                                    'by airplane_type_id = 1',
                         value='1'
                     )
                 ]
@@ -238,7 +243,8 @@ class FlightViewSet(viewsets.ModelViewSet):
                     OpenApiExample(
                         'Example 1',
                         summary='Example with source_airport',
-                        description='Example that show filtering by source_airport_id = 1',
+                        description='Example that show filtering '
+                                    'by source_airport_id = 1',
                         value='1'
                     )
                 ]
@@ -252,7 +258,8 @@ class FlightViewSet(viewsets.ModelViewSet):
                     OpenApiExample(
                         'Example 2',
                         summary='Example with destination_airport',
-                        description='Example that show filtering by destination_airport_id = 1',
+                        description='Example that show filtering '
+                                    'by destination_airport_id = 1',
                         value='1'
                     )
                 ]
