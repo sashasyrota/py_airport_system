@@ -70,3 +70,14 @@ password: `_adminadmin_`
 You can get a documentation on page:
 `http://127.0.0.1:8001/api/schema/swagger-ui/` in browser
 `http://127.0.0.1:8001/api/schema/` in yaml
+
+## Features
+* JWT authenticated
+* Admin panel
+* Documentation
+* Managing orders and tickets
+* Creating airports, airplanes, flights, crews
+* Filtering flights by airports
+* Filtering airplanes by airplane categories
+* Adding image to airplane
+
