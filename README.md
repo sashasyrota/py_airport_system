@@ -61,6 +61,11 @@ To do this, you need:
 4) Get access, refresh token of superuser on page `http://127.0.0.1:8001/api/token/`
 
 
+## Login
+To use functionality you can create own superuser or use this
+login: `_admin@admin.admin_`
+password: `_adminadmin_`
+
 ## Documentation
 You can get a documentation on page:
 `http://127.0.0.1:8001/api/schema/swagger-ui/` in browser
