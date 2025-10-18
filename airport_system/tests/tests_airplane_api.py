@@ -15,7 +15,6 @@ from airport_system.serializers import (
 from user.models import User
 
 
-
 AIRPLANE_URL = reverse("airport_system:airplane-list")
 
 
